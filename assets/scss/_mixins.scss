@@ -1,0 +1,83 @@
+@mixin flex-center($direction: row, $gap:0){
+    display: flex;
+    flex-direction: $direction;
+    justify-content: center;
+    align-items: center;
+    gap:$gap;
+}
+
+@mixin absolute-center{
+    position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+}
+
+@mixin text-ellipsis($lines:1){
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@mixin respond($breakpoint){
+    @media (max-width:$breakpoint){
+        @content;
+    }
+}
+
+@mixin adap-font($min-size, $max-size, $min-vw:320px, $max-vw:1200px){
+font-size:clamp($min-size, calc(#{$min-size} + (#{$max-size} - #{$min-size}) * ((100vw - #{$min-vw}) / (#{$max-vw} - #{$min-vw}))), $max-size );
+}
+
+@mixin post-card($bg:#fff, $hover-elevation:true){
+    background: $bg;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3 ease;
+
+    @if $hover-elevation{
+        &:hover{
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba($color: #000000, $alpha: 1.0);
+        }
+    }
+}
+
+@mixin quote-style($border-color:#ff5722){
+    padding-left: 1rem;
+    border-left: 3px solid $border-color;
+    font-style: italic;
+    color:lighten(#000, 30%);
+}
+
+@mixin column-center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+@mixin all-flex-center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@mixin text{
+  text-decoration: none;
+  color:black;
+  transition: 100ms;
+}
+@mixin text-hover{
+    color:rgb(255, 255, 255);
+    font-size: 1rem;
+    background-color: black;
+    border-radius: 5px;
+    padding: 10px;
+    transform: translateY(-5%)
+}

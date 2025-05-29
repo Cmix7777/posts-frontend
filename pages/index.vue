@@ -2,7 +2,7 @@
   <div class="container">
     <h1 class="title">Главная страница</h1>
     <NuxtLink to="/posts" class="post-link">
-      Смотреть все посты
+      <span>Смотреть все посты</span>
     </NuxtLink>
   </div>
 </template>
@@ -31,12 +31,13 @@
   text-decoration: none;
   color: #333;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
   
   &:hover {
-    background: #f5f5f5;
+    background: #000000;
     border-color: #999;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 10px rgba(177, 177, 177, 0.1);
+    color:white;
   }
 }
 </style>
