@@ -39,8 +39,9 @@ font-size:clamp($min-size, calc(#{$min-size} + (#{$max-size} - #{$min-size}) * (
 
     @if $hover-elevation{
         &:hover{
+            transition: 0.5s;
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba($color: #000000, $alpha: 1.0);
+            box-shadow: 0 10px 20px rgba($color: #000000, $alpha: 0.2);
         }
     }
 }

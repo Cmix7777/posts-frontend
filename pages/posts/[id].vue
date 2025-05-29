@@ -4,44 +4,143 @@ import { useAsyncData } from '#app'
 
 const route = useRoute()
 
-// Получение данных о посте по ID
 const { data: post } = useAsyncData(
-  () => `http://localhost:3001/posts/${route.params.id}`,
+  `post-${route.params.id}`,
   () => fetch(`http://localhost:3001/posts/${route.params.id}`).then(res => res.json())
 )
+
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString('ru-RU', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
 </script>
 
 <template>
-  <div v-if="post" class="main">
-    <h1>{{ post.title }}</h1>
-    <p>{{ post.body }}</p>
-    <NuxtLink to="/posts" class="main__posttext"><span>Назад к списку</span></NuxtLink>
+  <div class="post-detail">
+    <div v-if="post" class="post-container">
+      <div class="post-header">
+        <h1 class="post-title">{{ post.title }}</h1>
+        <div class="post-meta">
+          <span class="post-date">{{ formatDate(post.createdAt) }}</span>
+        </div>
+      </div>
+      
+      <div class="post-content">
+        <p>{{ post.body }}</p>
+      </div>
+      
+      <div class="post-footer">
+        <NuxtLink to="/posts" class="back-link">
+          ← Назад к списку
+        </NuxtLink>
+      </div>
+    </div>
+    
+    <div v-else>
+      <p>Загружаем пост...</p>
+    </div>
   </div>
-  <div v-else><h1>Грузим...</h1></div>
 </template>
 
 <style lang="scss">
-  .main{
-    border: solid 1px rgb(206, 206, 206);
-    margin: 1rem;
-    max-width: 40%;
-    @include all-flex-center;
-    border-radius: 5px;
+.post-detail {
+  @include all-flex-center;
+  padding: 2rem 1rem;
+  min-height: 80vh;
+}
 
-    &__posttext{
-    text-decoration: none;
-    color:black;
-    transition: 100ms;
+.post-container {
+  @include post-card(white, false);
+  max-width: 800px;
+  width: 100%;
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: #e0e0e0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  }
+}
 
-      &:hover{
-        color:rgb(255, 255, 255);
-        font-size: 1rem;
-        background-color: black;
-        border-radius: 5px;
-        padding: 10px;
-        transform: translateY(-5%)
-      }
+.post-header {
+  padding: 2rem 2rem 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  
+  .post-title {
+    @include adap-font(1.5rem, 2.2rem);
+    margin-bottom: 1rem;
+    color: #222;
+    line-height: 1.4;
+  }
+}
+
+.post-meta {
+  @include flex-center(row, 1.5rem);
+  font-size: 0.95rem;
+  color: #777;
+  
+  .post-id {
+    font-weight: 500;
+  }
+}
+
+.post-content {
+  padding: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #444;
+  
+  p {
+    margin-bottom: 1.5rem;
+    
+    &:last-child {
+      margin-bottom: 0;
     }
   }
+}
 
+.post-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.back-link {
+  @include text;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  
+  &:hover {
+    @include text-hover;
+  }
+}
+
+@include respond(768px) {
+  .post-container {
+    max-width: 90%;
+  }
+  
+  .post-header,
+  .post-content {
+    padding: 1.5rem;
+  }
+}
+
+@include respond(480px) {
+  .post-header,
+  .post-content {
+    padding: 1.25rem;
+  }
+  
+  .post-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+}
 </style>
