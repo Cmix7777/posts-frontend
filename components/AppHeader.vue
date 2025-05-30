@@ -2,6 +2,7 @@
   <header class="header">
     <NuxtLink to="/" class="header__link">На главную</NuxtLink>
     <NuxtLink to="/posts" class="header__link">Посты</NuxtLink>
+    <NuxtLink to="/posts/create" class="header__link">Создать пост</NuxtLink>
   </header>
 </template>
 

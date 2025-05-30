@@ -9,6 +9,12 @@ const { data: post } = useAsyncData(
   () => fetch(`http://localhost:3001/posts/${route.params.id}`).then(res => res.json())
 )
 
+
+const { data: comments } = useAsyncData(
+  'all-comments',
+  () => fetch('http://localhost:3001/comments').then(res => res.json())
+)
+
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('ru-RU', {
     year: 'numeric',
@@ -32,6 +38,22 @@ const formatDate = (dateString) => {
         <p>{{ post.body }}</p>
       </div>
       
+      <div v-if="comments" class="comments">
+        <template v-if="comments.filter(c => c.postId == post.id).lenght > 0">
+          <h1>Комментарии</h1>
+          <div class="commentaries">
+            <div v-for="comment in comments.filter(c => c.postId == post.id)" key:="comment.id" class="comment-item">
+              <div class="comm-header">
+                <span>{{ comment.author }}</span>
+                <span>{{ formateDate(comment.createAt) }}</span>
+              </div>
+              <div class="comm-text">{{ comment.text }}</div>
+            </div>
+          </div>
+        </template>
+        <div v-else>Пока нет комментариев</div>
+      </div>
+      <div v-else><p>Загруэаем комментарии...</p></div>
       <div class="post-footer">
         <NuxtLink to="/posts" class="back-link">
           ← Назад к списку
