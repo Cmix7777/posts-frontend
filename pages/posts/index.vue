@@ -1,9 +1,9 @@
 <script setup>
 import { useAsyncData } from '#app'
 
-const { data: posts } = useAsyncData(
+const { data: posts, pending: postsPending } = useAsyncData(
   'postsList',
-  () => fetch('http://localhost:3001/posts').then(res => res.json())
+  () => $fetch('http://localhost:3001/posts')
 )
 
 const formatDate = (dateString) => {
@@ -22,7 +22,11 @@ const formatDate = (dateString) => {
       <p>Последние мысли и идеи</p>
     </div>
     
-    <div class="posts-grid">
+    <div v-if="postsPending" class="loading">
+      Загрузка записей...
+    </div>
+    
+    <div v-else class="posts-grid">
       <div 
         v-for="post in posts" 
         :key="post.id" 
@@ -44,14 +48,12 @@ const formatDate = (dateString) => {
       </div>
     </div>
     
-    <div v-if="!posts" class="loading">
-      Загрузка записей...
+    <div v-if="!posts && !postsPending" class="no-posts">
+      Нет постов для отображения
     </div>
   </div>
 </template>
-
 <style scoped lang="scss">
-// Используем ваши миксины
 .posts-page {
   max-width: 1200px;
   margin: 0 auto;

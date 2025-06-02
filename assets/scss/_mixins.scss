@@ -40,7 +40,6 @@ font-size:clamp($min-size, calc(#{$min-size} + (#{$max-size} - #{$min-size}) * (
     @if $hover-elevation{
         &:hover{
             transition: 0.5s;
-            transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba($color: #000000, $alpha: 0.2);
         }
     }
@@ -76,9 +75,6 @@ font-size:clamp($min-size, calc(#{$min-size} + (#{$max-size} - #{$min-size}) * (
 }
 @mixin text-hover{
     color:rgb(255, 255, 255);
-    font-size: 1rem;
     background-color: black;
     border-radius: 5px;
-    padding: 10px;
-    transform: translateY(-5%)
 }
