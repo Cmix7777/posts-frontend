@@ -42,6 +42,10 @@ const deletePost = async () => {
     alert('Не удалось удалить пост')
   }
 }
+
+const editPost = () => {
+  router.push(`posts/edit-${route.params.id}`)
+}
 </script>
 
 <template>
@@ -51,15 +55,12 @@ const deletePost = async () => {
     </div>
     
     <div v-else-if="post" class="post-container">
-      <!-- Заголовок поста -->
       <div class="post-header">
         <h1 class="post-title">{{ post.title }}</h1>
         <button @click="deletePost" class="delete-button">
             Удалить пост
           </button>
-        <!-- <NuxtLink :to="`/posts/${postId}/edit`" class="edit-button">
-        Редактировать
-        </NuxtLink> -->
+        <button @click="editPost">Редактировать</button>
         <div class="post-meta">
           <span class="post-date">{{ formatDate(post.createdAt) }}</span>
         </div>
