@@ -42,10 +42,6 @@ const deletePost = async () => {
     alert('Не удалось удалить пост')
   }
 }
-
-const editPost = () => {
-  router.push(`posts/edit-${route.params.id}`)
-}
 </script>
 
 <template>
@@ -60,7 +56,6 @@ const editPost = () => {
         <button @click="deletePost" class="delete-button">
             Удалить пост
           </button>
-        <button @click="editPost">Редактировать</button>
         <div class="post-meta">
           <span class="post-date">{{ formatDate(post.createdAt) }}</span>
         </div>
