@@ -4,7 +4,15 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
   css: ['@/assets/scss/main.scss'],
-  
+  app:{
+    head:{
+      title:'Управляй своими постами - PostVibe',
+      meta:[
+        { name:'description', content:'Создавай и читай посты на лучшем сайта этого рода - PostVibe, место где создаются мысли и идеи'
+        }
+      ]
+    }
+  },
   vite:{
     css:{
       preprocessorOptions:{
