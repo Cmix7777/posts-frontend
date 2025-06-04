@@ -53,9 +53,20 @@ const deletePost = async () => {
     <div v-else-if="post" class="post-container">
       <div class="post-header">
         <h1 class="post-title">{{ post.title }}</h1>
+        <div class="post-actions">
+        <NuxtLink 
+          :to="`/posts/${post.id}/edit`" 
+          class="edit-button"
+        >
+          Редактировать пост
+        </NuxtLink>
         <button @click="deletePost" class="delete-button">
-            Удалить пост
-          </button>
+                    Удалить пост
+        </button>
+        </div>
+        
+          
+          
         <div class="post-meta">
           <span class="post-date">{{ formatDate(post.createdAt) }}</span>
         </div>
@@ -173,7 +184,25 @@ const deletePost = async () => {
   gap: 1rem;
   flex-wrap: wrap;
 }
-
+.edit-button{
+    text-decoration: none;
+  padding: 0.5rem 1rem;
+  background-color: #44d7ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color:  #77e2ff;
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
 .delete-button {
   padding: 0.5rem 1rem;
   background-color: #ff4444;
