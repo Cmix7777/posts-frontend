@@ -5,26 +5,23 @@ const postId = route.params.id
 
 const api = useApi()
 
-// Получаем пост с сервера
 const { data: currentPost, pending } = await useAsyncData(
   `edit-post-${postId}`,
   () => api.get(`/posts/${postId}`)
 )
 
-// Инициализируем форму с учетом данных поста
 const form = ref({
   title: '',
   body: '',
-  createdAt: '' // Добавляем поле даты
+  createdAt: '' 
 })
 
-// Когда данные загружены, заполняем форму
 watch(currentPost, (post) => {
   if (post) {
     form.value = {
       title: post.title,
       body: post.body,
-      createdAt: post.createdAt // Сохраняем оригинальную дату создания
+      createdAt: post.createdAt 
     }
   }
 }, { immediate: true })
@@ -42,11 +39,10 @@ const updatePost = async () => {
   errorMessage.value = ""
   
   try {
-    // Отправляем обновленные данные, сохраняя оригинальную дату
     await api.put(`/posts/${postId}`, {
       title: form.value.title,
       body: form.value.body,
-      createdAt: form.value.createdAt // Важно: сохраняем оригинальную дату
+      createdAt: form.value.createdAt 
     })
     
     await router.push(`/posts/${postId}`)
@@ -77,7 +73,6 @@ const updatePost = async () => {
           :error="errorMessage && !form.title.trim() ? errorMessage : ''"
         />
         
-        <!-- Поле содержания -->
         <div class="form-group">
           <label for="body" class="form-label">Содержание</label>
           <textarea
@@ -90,7 +85,6 @@ const updatePost = async () => {
           <span v-if="errorMessage && !form.body.trim()" class="error-message">{{ errorMessage }}</span>
         </div>
         
-        <!-- Блок с датой создания (только для отображения) -->
         <div class="form-group" v-if="form.createdAt">
           <label class="form-label">Дата создания</label>
           <div class="date-display">
@@ -102,7 +96,6 @@ const updatePost = async () => {
           </div>
         </div>
         
-        <!-- Кнопки действий -->
         <div class="form-actions">
           <AppButton 
             type="button" 
