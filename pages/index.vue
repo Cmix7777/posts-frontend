@@ -1,13 +1,17 @@
 <script setup>
-import { useLazyAsyncData } from '#app' 
-
-const { data: posts, pending: postsPending } = useLazyAsyncData(
-  'homepage-posts',
+const { data: posts, pending} = await useAsyncData(
+  'homepage-posts', 
   async () => {
-    const allPosts = await $fetch('http://localhost:3001/posts')
+    const api = useApi()
+    const allPosts = await api.get('/posts')
     return allPosts
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 3)
+  },
+  {
+    getCachedData(key) {
+      return useNuxtApp().payload.data[key]
+    }
   }
 )
 
@@ -18,6 +22,7 @@ const formatDate = (dateString) => {
     day: 'numeric'
   })
 }
+
 </script>
 
 <template>
@@ -27,7 +32,7 @@ const formatDate = (dateString) => {
     <div class="posts-preview" v-if="posts && posts.length">
       <h2 class="subtitle">Последние записи</h2>
       
-      <div v-if="postsPending" class="loading-posts">
+      <div v-if="pending" class="loading-posts">
         <p>Загружаем последние посты...</p>
       </div>
       
@@ -57,7 +62,6 @@ const formatDate = (dateString) => {
     </NuxtLink>
   </div>
 </template>
-
 <style scoped lang="scss">
 .loading-posts {
   @include all-flex-center;
@@ -159,7 +163,6 @@ const formatDate = (dateString) => {
   @include text;
   padding: 1rem 2rem;
   border: 1px solid #ddd;
-  margin-top: 2rem;
   font-size: 28px;
   
   &:hover {

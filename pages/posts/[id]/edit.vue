@@ -1,20 +1,33 @@
 <script setup>
-import { ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
 const route = useRoute()
 const router = useRouter()
 const postId = route.params.id
 
+const api = useApi()
+
+// Получаем пост с сервера
 const { data: currentPost, pending } = await useAsyncData(
   `edit-post-${postId}`,
-  () => $fetch(`http://localhost:3001/posts/${postId}`)
+  () => api.get(`/posts/${postId}`)
 )
 
+// Инициализируем форму с учетом данных поста
 const form = ref({
-  title: currentPost.value?.title || '',
-  body: currentPost.value?.body || ''
+  title: '',
+  body: '',
+  createdAt: '' // Добавляем поле даты
 })
+
+// Когда данные загружены, заполняем форму
+watch(currentPost, (post) => {
+  if (post) {
+    form.value = {
+      title: post.title,
+      body: post.body,
+      createdAt: post.createdAt // Сохраняем оригинальную дату создания
+    }
+  }
+}, { immediate: true })
 
 const isSubmitting = ref(false)
 const errorMessage = ref('')
@@ -29,18 +42,17 @@ const updatePost = async () => {
   errorMessage.value = ""
   
   try {
-    await $fetch(`http://localhost:3001/posts/${postId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(form.value)
+    // Отправляем обновленные данные, сохраняя оригинальную дату
+    await api.put(`/posts/${postId}`, {
+      title: form.value.title,
+      body: form.value.body,
+      createdAt: form.value.createdAt // Важно: сохраняем оригинальную дату
     })
     
     await router.push(`/posts/${postId}`)
   } catch (err) {
-    console.error('Ошибка при обновлении поста:', err)
     errorMessage.value = `Ошибка: ${err.message || 'Не удалось обновить пост'}`
+    console.error('Ошибка при обновлении:', err)
   } finally {
     isSubmitting.value = false
   }
@@ -57,48 +69,57 @@ const updatePost = async () => {
       <h1 class="edit-title">Редактировать пост</h1>
       
       <form @submit.prevent="updatePost" class="edit-form">
-        <div class="form-group">
-          <label for="title" class="form-label">Заголовок</label>
-          <input 
-            type="text" 
-            id="title" 
-            v-model="form.title" 
-            class="form-input"
-            placeholder="Введите заголовок"
-          >
-        </div>
+        <!-- Поле заголовка -->
+        <AppInput
+          v-model="form.title"
+          label="Заголовок"
+          placeholder="Введите заголовок"
+          :error="errorMessage && !form.title.trim() ? errorMessage : ''"
+        />
         
+        <!-- Поле содержания -->
         <div class="form-group">
           <label for="body" class="form-label">Содержание</label>
-          <textarea 
-            id="body" 
-            v-model="form.body" 
-            class="form-textarea"
+          <textarea
+            id="body"
+            v-model="form.body"
             placeholder="Напишите содержание поста"
+            class="form-textarea"
             rows="8"
           ></textarea>
+          <span v-if="errorMessage && !form.body.trim()" class="error-message">{{ errorMessage }}</span>
         </div>
         
-        <div v-if="errorMessage" class="error-message">
-          {{ errorMessage }}
+        <!-- Блок с датой создания (только для отображения) -->
+        <div class="form-group" v-if="form.createdAt">
+          <label class="form-label">Дата создания</label>
+          <div class="date-display">
+            {{ new Date(form.createdAt).toLocaleDateString('ru-RU', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }) }}
+          </div>
         </div>
         
+        <!-- Кнопки действий -->
         <div class="form-actions">
-          <button 
+          <AppButton 
             type="button" 
-            class="cancel-button"
+            variant="secondary"
             @click="router.push(`/posts/${postId}`)"
           >
             Отмена
-          </button>
-          <button 
+          </AppButton>
+          
+          <AppButton 
             type="submit" 
-            class="submit-button"
             :disabled="isSubmitting"
+            variant="primary"
           >
             <span v-if="isSubmitting">Сохранение...</span>
             <span v-else>Сохранить изменения</span>
-          </button>
+          </AppButton>
         </div>
       </form>
     </div>

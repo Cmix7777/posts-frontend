@@ -1,9 +1,10 @@
 <script setup>
-import { useAsyncData } from '#app'
-
-const { data: posts, pending: postsPending } = useAsyncData(
+const { data: posts, pending } = await useAsyncData(
   'postsList',
-  () => $fetch('http://localhost:3001/posts')
+  () => {
+    const api = useApi()
+    return api.get('/posts')
+  }
 )
 
 const formatDate = (dateString) => {
@@ -22,7 +23,7 @@ const formatDate = (dateString) => {
       <p>Последние мысли и идеи</p>
     </div>
     
-    <div v-if="postsPending" class="loading">
+    <div v-if="pending" class="loading">
       Загрузка записей...
     </div>
     
@@ -48,11 +49,12 @@ const formatDate = (dateString) => {
       </div>
     </div>
     
-    <div v-if="!posts && !postsPending" class="no-posts">
+    <div v-if="!posts && !pending" class="no-posts">
       Нет постов для отображения
     </div>
   </div>
 </template>
+
 <style scoped lang="scss">
 .posts-page {
   max-width: 1200px;

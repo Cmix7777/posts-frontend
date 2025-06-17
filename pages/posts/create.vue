@@ -1,40 +1,34 @@
 <script setup>
-import { ref } from 'vue'
-
-const title = ref('')
-const body = ref('')
+const form = ref({
+  title: '',
+  body: ''
+})
 const error = ref('')
-const loading = ref(false)
+const isSubmitting = ref(false)
+
+const api = useApi()
 
 const createPost = async () => {
-  if (!title.value.trim() || !body.value.trim()) {
+  if (!form.value.title.trim() || !form.value.body.trim()) {
     error.value = "Заголовок и текст поста обязательны для заполнения"
     return
   }
   
-  loading.value = true
+  isSubmitting.value = true
   error.value = ""
   
   try {
-    const newPost = await $fetch('http://localhost:3001/posts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        title: title.value,
-        body: body.value,
-        createdAt: new Date().toISOString()
-      })
+    const newPost = await api.post('/posts', {
+      title: form.value.title,
+      body: form.value.body,
+      createdAt: new Date().toISOString()
     })
     
-    console.log('Создан новый пост: ', newPost)
     await navigateTo(`/posts/${newPost.id}`)
   } catch (err) {
-    error.value = `Ошибка: ${err.message}`
-    console.error('Ошибка при создании поста: ', err)
+    error.value = `Ошибка: ${err.message || 'Не удалось создать пост'}`
   } finally {
-    loading.value = false
+    isSubmitting.value = false
   }
 }
 </script>
@@ -45,32 +39,33 @@ const createPost = async () => {
       <h1 class="create-title">Создать новый пост</h1>
       
       <form @submit.prevent="createPost" class="create-form">
-        <div class="form-group">
-          <input 
-            type="text" 
-            v-model="title" 
-            placeholder="Заголовок поста"
-            class="form-input"
-          >
-        </div>
+        <AppInput
+          v-model="form.title"
+          placeholder="Заголовок поста"
+          label="Заголовок"
+          :error="error && !form.title.trim() ? error : ''"
+        />
         
         <div class="form-group">
-          <textarea 
-            v-model="body" 
+          <label for="body" class="form-label">Содержание</label>
+          <textarea
+            id="body"
+            v-model="form.body"
             placeholder="Содержание поста"
             class="form-textarea"
             rows="6"
           ></textarea>
+          <span v-if="error && !form.body.trim()" class="error-message">{{ error }}</span>
         </div>
         
-        <div v-if="error" class="error-message">
-          {{ error }}
-        </div>
-        
-        <button type="submit" class="submit-button" :disabled="loading">
-          <span v-if="loading">Создание...</span>
+        <AppButton 
+          type="submit" 
+          :disabled="isSubmitting"
+          class="submit-button"
+        >
+          <span v-if="isSubmitting">Создание...</span>
           <span v-else>Опубликовать пост</span>
-        </button>
+        </AppButton>
       </form>
     </div>
   </div>
@@ -110,55 +105,37 @@ const createPost = async () => {
   flex-direction: column;
 }
 
-.form-input, .form-textarea {
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.form-textarea {
   background: #f9f9f9;
   padding: 1rem;
   border: 1px solid #ddd;
   border-radius: 8px;
   transition: all 0.3s ease;
   font-size: 1rem;
+  min-height: 200px;
+  resize: vertical;
   
   &:focus {
     border-color: #333;
     outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
   }
-}
-
-.form-textarea {
-  min-height: 200px;
-  resize: vertical;
 }
 
 .error-message {
-  background: #ffeeee;
-  padding: 1rem;
-  color: #d32f2f;
-  border: 1px solid #ffcdd2;
-  border-radius: 8px;
+  color: #ff4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
 .submit-button {
-  @include text;
-  padding: 1rem 2rem;
-  background: white;
-  color: black;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  
-  &:hover:not(:disabled) {
-    @include text-hover;
-  }
-  
-  &:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-    color: #666;
-  }
+  margin-top: 1rem;
 }
 
 @include respond(768px) {
@@ -175,11 +152,6 @@ const createPost = async () => {
   
   .create-title {
     font-size: 1.8rem;
-  }
-  
-  .submit-button {
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
   }
 }
 </style>

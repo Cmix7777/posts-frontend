@@ -1,19 +1,18 @@
 <script setup>
-import { useRoute, useRouter } from 'vue-router' 
-import { useAsyncData, useLazyAsyncData } from '#app' 
-
 const route = useRoute()
 const router = useRouter() 
 const postId = route.params.id
 
+const api = useApi() 
+
 const { data: post, pending: postPending } = useAsyncData(
   `post-${postId}`,
-  () => $fetch(`http://localhost:3001/posts/${postId}`)
+  () => api.get(`/posts/${postId}`) 
 )
 
 const { data: comments, pending: commentsPending } = useLazyAsyncData(
   `comments-${postId}`,
-  () => $fetch('http://localhost:3001/comments')
+  () => api.get('/comments') 
 )
 
 const postComments = computed(() => {
@@ -33,9 +32,7 @@ const deletePost = async () => {
   if (!confirm('Вы уверены, что хотите удалить этот пост?')) return
   
   try {
-    await $fetch(`http://localhost:3001/posts/${postId}`, {
-      method: 'DELETE'
-    })
+    await api.delete(`/posts/${postId}`) 
     router.push('/posts')
   } catch (error) {
     console.error('Ошибка при удалении поста:', error)
@@ -190,7 +187,7 @@ const deletePost = async () => {
   background-color: #44d7ff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 4px 0 0 4px ;
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.2s ease;
@@ -208,7 +205,7 @@ const deletePost = async () => {
   background-color: #ff4444;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 0 4px 4px 0;
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.2s ease;
