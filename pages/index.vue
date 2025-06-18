@@ -1,12 +1,13 @@
 <script setup>
-const { data: posts, pending} = await useAsyncData(
+const api = useApi()
+
+const { data: posts, pending } = await useAsyncData(
   'homepage-posts', 
   async () => {
-    const api = useApi()
-    const allPosts = await api.get('/posts')
+    const allPosts = await api.get('/posts', { 
+      _limit: 3
+    })
     return allPosts
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 3)
   },
   {
     getCachedData(key) {
@@ -22,8 +23,8 @@ const formatDate = (dateString) => {
     day: 'numeric'
   })
 }
-
 </script>
+
 
 <template>
   <div class="container">

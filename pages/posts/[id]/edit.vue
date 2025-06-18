@@ -98,20 +98,20 @@ const updatePost = async () => {
         
         <div class="form-actions">
           <AppButton 
-            type="button" 
-            variant="secondary"
-            @click="router.push(`/posts/${postId}`)"
+          type="button" 
+          variant="secondary"
+          @click="router.push(`/posts/${postId}`)"
           >
-            Отмена
+          Отмена
           </AppButton>
-          
+        
           <AppButton 
-            type="submit" 
-            :disabled="isSubmitting"
-            variant="primary"
+          type="submit" 
+          :disabled="isSubmitting"
+          variant="primary"
           >
-            <span v-if="isSubmitting">Сохранение...</span>
-            <span v-else>Сохранить изменения</span>
+          <span v-if="isSubmitting">Сохранение...</span>
+          <span v-else>Сохранить изменения</span>
           </AppButton>
         </div>
       </form>

@@ -3,8 +3,7 @@
     <label v-if="label" class="input-label">{{ label }}</label>
     <input
       v-bind="$attrs"
-      :value="modelValue"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      v-model="model"
       class="app-input"
       :class="{ 'error': error }"
     >
@@ -13,16 +12,15 @@
 </template>
 
 <script setup lang="ts">
+const model = defineModel<string | number>({
+  required: true,
+  default: ''
+})
+
 defineProps({
-  modelValue: {
-    type: [String, Number],
-    default: ''
-  },
   label: String,
   error: String
 })
-
-defineEmits(['update:modelValue'])
 </script>
 
 <style scoped lang="scss">

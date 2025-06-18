@@ -61,8 +61,9 @@ const createPost = async () => {
         <AppButton 
           type="submit" 
           :disabled="isSubmitting"
+          variant="primary"
           class="submit-button"
-        >
+          >
           <span v-if="isSubmitting">Создание...</span>
           <span v-else>Опубликовать пост</span>
         </AppButton>
