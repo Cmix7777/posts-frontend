@@ -13,15 +13,13 @@ const { data: currentPost, pending } = await useAsyncData(
 const form = ref({
   title: '',
   body: '',
-  createdAt: '' 
 })
 
 watch(currentPost, (post) => {
   if (post) {
     form.value = {
       title: post.title,
-      body: post.body,
-      createdAt: post.createdAt 
+      body: post.body
     }
   }
 }, { immediate: true })
@@ -41,8 +39,7 @@ const updatePost = async () => {
   try {
     await api.put(`/posts/${postId}`, {
       title: form.value.title,
-      body: form.value.body,
-      createdAt: form.value.createdAt 
+      body: form.value.body
     })
     
     await router.push(`/posts/${postId}`)
@@ -65,7 +62,6 @@ const updatePost = async () => {
       <h1 class="edit-title">Редактировать пост</h1>
       
       <form @submit.prevent="updatePost" class="edit-form">
-        <!-- Поле заголовка -->
         <AppInput
           v-model="form.title"
           label="Заголовок"
@@ -83,17 +79,6 @@ const updatePost = async () => {
             rows="8"
           ></textarea>
           <span v-if="errorMessage && !form.body.trim()" class="error-message">{{ errorMessage }}</span>
-        </div>
-        
-        <div class="form-group" v-if="form.createdAt">
-          <label class="form-label">Дата создания</label>
-          <div class="date-display">
-            {{ new Date(form.createdAt).toLocaleDateString('ru-RU', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            }) }}
-          </div>
         </div>
         
         <div class="form-actions">
