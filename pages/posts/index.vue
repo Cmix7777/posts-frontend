@@ -1,4 +1,7 @@
 <script setup>
+const currentPage = ref(1)
+const itemsPerPage = ref(6)
+
 const { data: posts, pending } = await useAsyncData(
   'postsList',
   () => {
@@ -14,6 +17,34 @@ const formatDate = (dateString) => {
     day: 'numeric'
   })
 }
+
+const paginatedPosts = computed(() => {
+  if (!posts.value) return []
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  const end = start + itemsPerPage.value
+  return posts.value.slice(start, end)
+})
+
+const totalPages = computed(() => {
+  if (!posts.value) return 0
+  return Math.ceil(posts.value.length / itemsPerPage.value)
+})
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
+
+const goToPage = (page) => {
+  currentPage.value = page
+}
 </script>
 
 <template>
@@ -27,29 +58,59 @@ const formatDate = (dateString) => {
       Загрузка записей...
     </div>
     
-    <div v-else class="posts-grid">
-      <div 
-        v-for="post in posts" 
-        :key="post.id" 
-        class="post-card"
-      >
-        <div class="card-content">
-          <div class="post-meta">
-            <span class="post-date">{{ formatDate(post.createdAt) }}</span>
+    <div v-else>
+      <div class="posts-grid">
+        <div 
+          v-for="post in paginatedPosts" 
+          :key="post.id" 
+          class="post-card"
+        >
+          <div class="card-content">
+            <div class="post-meta">
+              <span class="post-date">{{ formatDate(post.createdAt) }}</span>
+            </div>
+            
+            <h2 class="post-title">{{ post.title }}</h2>
+            
+            <p class="post-excerpt">{{ post.body }}</p>
           </div>
           
-          <h2 class="post-title">{{ post.title }}</h2>
-          
-          <p class="post-excerpt">{{ post.body }}</p>
+          <NuxtLink :to="`/posts/${post.id}`" class="read-link">
+            Читать дальше
+          </NuxtLink>
         </div>
+      </div>
+      
+      <div v-if="totalPages > 1" class="pagination">
+        <button 
+          @click="prevPage" 
+          :disabled="currentPage === 1"
+          class="pagination-button"
+        >
+          Назад
+        </button>
         
-        <NuxtLink :to="`/posts/${post.id}`" class="read-link">
-          Читать дальше
-        </NuxtLink>
+        <button
+          v-for="page in totalPages"
+          :key="page"
+          @click="goToPage(page)"
+          :class="{ active: currentPage === page }"
+          class="pagination-button"
+        >
+          {{ page }}
+        </button>
+        
+        <button 
+          @click="nextPage" 
+          :disabled="currentPage === totalPages"
+          class="pagination-button"
+        >
+          Вперед
+        </button>
       </div>
     </div>
     
-    <div v-if="!posts && !pending" class="no-posts">
+    <div v-if="!posts?.length && !pending" class="no-posts">
       Нет постов для отображения
     </div>
   </div>
@@ -86,6 +147,7 @@ const formatDate = (dateString) => {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
   width: 100%;
+  margin-bottom: 3rem;
 }
 
 .post-card {
@@ -160,6 +222,39 @@ const formatDate = (dateString) => {
   color: #777;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.pagination-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  min-width: 40px;
+
+  &:hover:not(:disabled) {
+    background: #f0f0f0;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.active {
+    background: #000;
+    color: white;
+    border-color: #000;
+  }
+}
+
 @include respond(768px) {
   .posts-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -168,6 +263,15 @@ const formatDate = (dateString) => {
   
   .page-header {
     margin-bottom: 2rem;
+  }
+
+  .pagination {
+    gap: 0.3rem;
+  }
+
+  .pagination-button {
+    padding: 0.4rem 0.8rem;
+    min-width: 35px;
   }
 }
 
@@ -178,6 +282,10 @@ const formatDate = (dateString) => {
   
   .post-card {
     max-width: 100%;
+  }
+
+  .pagination {
+    gap: 0.2rem;
   }
 }
 </style>
